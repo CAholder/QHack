@@ -30,7 +30,8 @@ def compare_circuits(angles):
     @qml.qnode(dev1)
     def circuit2(angles):
         print(angles)
-        qml.RY(angles[1], wires=0)
+        print(qml.RY(angles[1], wires=0))
+
         qml.RX(angles[0], wires=0)
         return qml.expval(qml.PauliX(0))
 
