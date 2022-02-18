@@ -1,6 +1,7 @@
 #! /usr/bin/python3
 
 import sys
+import numpy
 import pennylane as qml
 from pennylane import numpy as np
 
@@ -20,15 +21,46 @@ def superdense_coding(bits, alpha):
     """
 
     # QHACK #
+    # wires=0 is Alice
+    # wires=1 is Bob
 
     # Prepare entangled state here
+    def entanglement():
+        qml.RY(alpha*2,wires=0)
+        qml.CNOT(wires=[0,1])
+
+        # return qml.state()
+
 
     # Implement Alice's operations on her qubit here
+    def alicestuff():
+        if bits == 0:
+            pass
+            # return qml.state()
+        elif bits == 1:
+            qml.PauliX(wires=0)
+            # return qml.state()
+        elif bits == 2:
+            qml.PauliZ(wires=0)
+            # return qml.state()
+        elif bits == 3:
+            qml.PauliX(wires=0)
+            qml.PauliZ(wires=0)
+            # return qml.state()
+        else:
+            pass
 
     # Implement Bob's measurement procedure here
+    def bobstuff():
+        qml.CNOT(wires=[0,1])
+        qml.Hadamard(wires=0)
+
+
+    entanglement()
+    alicestuff()
+    bobstuff()
 
     # QHACK #
-
     return qml.probs(wires=[0, 1])
 
 

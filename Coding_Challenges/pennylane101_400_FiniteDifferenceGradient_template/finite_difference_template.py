@@ -1,6 +1,8 @@
 #! /usr/bin/python3
 
 import sys
+
+import numpy
 import pennylane as qml
 from pennylane import numpy as np
 
@@ -20,7 +22,11 @@ def my_finite_diff_grad(params):
 
     gradients = np.zeros([len(params)])
     for i in range(len(params)):
-        # QHACK # 
+        # QHACK #
+        dx = 1.5
+        new = numpy.gradient(params, dx)
+        print(new)
+        gradients[i] = cost(new)
 
         # QHACK #
 
