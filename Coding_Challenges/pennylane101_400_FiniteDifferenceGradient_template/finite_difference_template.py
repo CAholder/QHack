@@ -2,7 +2,7 @@
 
 import sys
 
-import numpy
+
 import pennylane as qml
 from pennylane import numpy as np
 
@@ -19,17 +19,23 @@ def my_finite_diff_grad(params):
     Returns:
         - gradients (np.ndarray): the gradient w.r.t. each parameter
     """
-
     gradients = np.zeros([len(params)])
     for i in range(len(params)):
         # QHACK #
-        dx = 1.5
-        new = numpy.gradient(params, dx)
-        print(new)
-        gradients[i] = cost(new)
+
+        derivative = params.copy()
+        derivative[i] += np.pi/2
+        forwards = cost(derivative)
+
+        derivative[i] -= np.pi
+        backwards = cost(derivative)
+
+        result = 0.5 * (forwards - backwards)
+
+
+        gradients[i] = result
 
         # QHACK #
-
     return gradients
 
 

@@ -50,13 +50,14 @@ def circuit(p, alpha, tampered_wire):
 
     # QHACK #
 
-    # put any input processing gates here
+    qml.Hadamard(wires=0)
+    qml.CNOT(wires=[0,1])
 
     qml.BitFlip(p, wires=int(tampered_wire))
 
     # put any gates here after the bitflip error has occurred
 
-    # return something!
+    return qml.expval(qml.PauliZ(0) @ qml.PauliX(1))
     # QHACK #
 
 

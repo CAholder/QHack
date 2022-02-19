@@ -60,18 +60,15 @@ def compare_circuits(num_wires, params):
             - (np.tensor): A density matrix
         """
         x = 0
-        print(params)
         while x < num_wires:
             qml.RY(params[1][x], wires=x)
             x += 1
-        print("pass2")
         return qml.state()
 
     # QHACK #
 
     # DO NOT MODIFY any of the next lines in this scope
     mixed_state = mixed_circuit()
-    print("pass4")
     pure_state = pure_circuit()
     mat_norm = matrix_norm(mixed_state, pure_state)
 
