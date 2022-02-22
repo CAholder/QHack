@@ -1,6 +1,8 @@
 #! /usr/bin/python3
 
 import sys
+
+import numpy
 from pennylane import numpy as np
 import pennylane as qml
 
@@ -28,6 +30,9 @@ def generating_fourier_state(n_qubits, m):
         # QHACK #
 
         # Add the template of the statement with the angles passed as an argument.
+        for x in range(n_qubits):
+            qml.Hadamard(x)
+            qml.RZ(angles[x], wires=x)
 
         # QHACK #
 
@@ -42,18 +47,25 @@ def generating_fourier_state(n_qubits, m):
         """This function will determine, given a set of angles, how well it approximates
         the desired state. Here it will be necessary to call the circuit to work with these results.
         """
-
+        print("Error function pass")
         probs = circuit(angles)
+        print(probs, "Probs data type")
         # QHACK #
 
         # The return error should be smaller when the state m is more likely to be obtained.
-
+        differences = 0
+        for x in range(len(probs)):
+            differences += angles[x] - probs[x]
+        error = differences/len(probs)
+        print(error, "Value pass")
+        return error
         # QHACK #
 
     # This subroutine will find the angles that minimize the error function.
     # Do not modify anything from here.
 
     opt = qml.AdamOptimizer(stepsize=0.8)
+    print(opt)
     epochs = 5000
 
     angles = np.zeros(n_qubits, requires_grad=True)
@@ -61,7 +73,7 @@ def generating_fourier_state(n_qubits, m):
     for epoch in range(epochs):
         angles = opt.step(error, angles)
         angles = np.clip(opt.step(error, angles), -2 * np.pi, 2 * np.pi)
-
+    print(angles, "Angles two passs")
     return circuit, angles
 
 
