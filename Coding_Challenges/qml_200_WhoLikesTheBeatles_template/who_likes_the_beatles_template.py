@@ -20,10 +20,48 @@ def distance(A, B):
 
     # The Swap test is a method that allows you to calculate |<A|B>|^2 , you could use it to help you.
     # The qml.AmplitudeEmbedding operator could help you too.
+    num_wires = int(np.ceil(np.log2(len(A))))
 
-    # dev = qml.device("default.qubit", ...
-    # @qml.qnode(dev)
+    dev = qml.device("default.qubit", wires=num_wires*3)
 
+    @qml.qnode(dev)
+    def reg1(inputs_valid):
+        qml.AmplitudeEmbedding(features=inputs_valid, wires=range(num_wires, num_wires*3), normalize=True, pad_with=0.)
+        ancillea = []
+
+        # for i in range(num_wires):
+        #
+        #     anc = i
+        #     ancillea.append(anc)
+        #     first_qubit = i+num_wires
+        #     second_qubit = i + (2*num_wires)
+        #
+        #     # qml.PauliX(wires=first_qubit)
+        #     qml.PauliX(wires=second_qubit)
+        #     qml.Identity(wires=second_qubit)
+        #     qml.Hadamard(wires=anc)
+        #     qml.CSWAP(wires=[anc, first_qubit, second_qubit])
+        #     qml.Hadamard(wires=anc)
+
+        for i in range(num_wires):
+            anc = i
+            ancillea.append(anc)
+            qml.Hadamard(wires=anc)
+            for x in range(num_wires):
+                first_state = x + num_wires
+                # qml.PauliX(wires=first_state)
+                second_state = x + 2*num_wires
+                # qml.PauliX(wires=second_state)
+                qml.CSWAP(wires=[anc,first_state,second_state])
+            qml.Hadamard(wires=anc)
+
+        return qml.expval(qml.operation.Tensor(*[qml.PauliZ(i) for i in ancillea]))
+        # return qml.expval(*[qml.PauliZ(i) for i in ancillea])
+    inputs_valid = np.concatenate([A, B])
+    result = reg1(inputs_valid)
+    # print(np.sqrt(result))
+    # np.sqrt(np.abs(result))
+    return np.sqrt(2*(1-np.abs(result)))
     # QHACK #
 
 
