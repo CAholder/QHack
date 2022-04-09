@@ -1,6 +1,8 @@
 #! /usr/bin/python3
 
 import sys
+
+import numpy
 from pennylane import numpy as np
 import pennylane as qml
 
@@ -20,13 +22,16 @@ def distance(A, B):
 
     # The Swap test is a method that allows you to calculate |<A|B>|^2 , you could use it to help you.
     # The qml.AmplitudeEmbedding operator could help you too.
+    # Supposed to train on Qubit 1 with no labels
+    # Supposed to train on Qubit 2 with labels
     num_wires = int(np.ceil(np.log2(len(A))))
 
     dev = qml.device("default.qubit", wires=num_wires*3)
 
     @qml.qnode(dev)
     def reg1(inputs_valid):
-        qml.AmplitudeEmbedding(features=inputs_valid, wires=range(num_wires, num_wires*3), normalize=True, pad_with=0.)
+        qml.AmplitudeEmbedding(features=inputs_valid[2:4], wires=range(num_wires, num_wires * 3), normalize=True,
+                               pad_with=0.)
         ancillea = []
 
         # for i in range(num_wires):
@@ -42,26 +47,41 @@ def distance(A, B):
         #     qml.Hadamard(wires=anc)
         #     qml.CSWAP(wires=[anc, first_qubit, second_qubit])
         #     qml.Hadamard(wires=anc)
+        anc = 0
+        qml.Hadamard(wires=anc)
+        # qml.RX(inputs_valid[], wires=1)
+        # qml.RX(inputs_valid[1], wires=2)
+        qml.CSWAP(wires=[anc, 1, 2])
+        qml.Hadamard(wires=anc)
 
-        for i in range(num_wires):
-            anc = i
-            ancillea.append(anc)
-            qml.Hadamard(wires=anc)
-            for x in range(num_wires):
-                first_state = x + num_wires
-                # qml.PauliX(wires=first_state)
-                second_state = x + 2*num_wires
-                # qml.PauliX(wires=second_state)
-                qml.CSWAP(wires=[anc,first_state,second_state])
-            qml.Hadamard(wires=anc)
 
-        return qml.expval(qml.operation.Tensor(*[qml.PauliZ(i) for i in ancillea]))
+
+        # for i in range(num_wires):
+        #     anc = i
+        #     ancillea.append(anc)
+        #     qml.Hadamard(wires=anc)
+        #     for x in range(num_wires):
+        #         first_state = x + num_wires
+        #         # qml.PauliX(wires=first_state)
+        #         second_state = x + 2*num_wires
+        #         # qml.PauliX(wires=second_state)
+        #         qml.CSWAP(wires=[anc,first_state,second_state])
+        #     qml.Hadamard(wires=anc)
+
+        # return qml.expval(qml.operation.Tensor(*[qml.PauliZ(i) for i in ancillea]))
+        return qml.expval(qml.PauliZ(anc))
         # return qml.expval(*[qml.PauliZ(i) for i in ancillea])
     inputs_valid = np.concatenate([A, B])
+    print("This is A", A)
+    print("This is B", B)
+    print(inputs_valid)
+    print(inputs_valid[2:4])
     result = reg1(inputs_valid)
     # print(np.sqrt(result))
     # np.sqrt(np.abs(result))
-    return np.sqrt(2*(1-np.abs(result)))
+    # np.sqrt(2*(1-(np.abs(result))))
+    result2 = np.sqrt(result)
+    return np.sqrt(2*(1-(np.abs(result2))))
     # QHACK #
 
 

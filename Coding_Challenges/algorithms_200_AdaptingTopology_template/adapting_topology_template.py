@@ -30,6 +30,16 @@ def n_swaps(cnot):
 
     # QHACK #
 
+    wires = cnot.wires
+    print(wires)
+    print(wires[1])
+    print(wires[0])
+    print(type(wires))
+    print(graph[wires[1]])
+
+
+
+
     # QHACK #
 
 

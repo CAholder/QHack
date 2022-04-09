@@ -1,4 +1,6 @@
 import sys
+
+import numpy
 import pennylane as qml
 from pennylane import numpy as np
 
@@ -20,13 +22,14 @@ def deutsch_jozsa(oracle):
         """Implements the Deutsch Jozsa algorithm."""
 
         # QHACK #
-
-        # Insert any pre-oracle processing here
-
+        qml.PauliX(wires=2)
+        qml.Hadamard(wires=0)
+        qml.Hadamard(wires=1)
+        qml.Hadamard(wires=2)
         oracle()  # DO NOT MODIFY this line
 
-        # Insert any post-oracle processing here
-
+        qml.Hadamard(wires=0)
+        qml.Hadamard(wires=1)
         # QHACK #
 
         return qml.sample(wires=range(2))
@@ -34,8 +37,18 @@ def deutsch_jozsa(oracle):
     sample = circuit()
 
     # QHACK #
-
     # From `sample` (a single call to the circuit), determine whether the function is constant or balanced.
+    solution = sample.numpy()
+    solution = solution.tolist()
+    if solution[0] == 0 and solution[1] == 1:
+        return "balanced"
+    elif solution[0] == 1 and solution[1] == 0:
+        return "balanced"
+    elif solution[0] == 0 and solution[1] == 0:
+        return "constant"
+    elif solution[0] == 1 and solution[1] == 1:
+        return "constant"
+
 
     # QHACK #
 
